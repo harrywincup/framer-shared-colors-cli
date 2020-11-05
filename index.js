@@ -173,9 +173,6 @@ function merge(argv) {
     }
 
     const tokens = readInputColorTokens(colorsPath);
-    console.log(tokens);
-    return false;
-
     const doc = readFramerDocument(documentPath);
     const updatedDoc = mergeColorTokens(doc, tokens);
     writeFramerDocument(updatedDoc, documentPath);
