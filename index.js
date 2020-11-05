@@ -9,15 +9,23 @@ const argv = require('minimist')(process.argv.slice(2));
 
 // Utility
 // -------
+function extractNestedColors(obj, fullPath) {
+    return Object.keys(obj).flatMap(key => {
+        if (typeof obj[key] == 'string') {
+            return asToken({
+                name: fullPath.slice(1) + '/' + key,
+                value: obj[key],
+            });
+        }
+
+        return extractNestedColors(obj[key], fullPath + '/' + key);
+    });
+}
 
 function readInputColorTokens(path) {
     const json = JSON.parse(fs.readFileSync(path));
-    return Object.keys(json).map(key =>
-        asToken({
-            name: key,
-            value: json[key],
-        }),
-    );
+
+    return extractNestedColors(json, '');
 }
 
 function readFramerDocument(path) {
@@ -165,6 +173,9 @@ function merge(argv) {
     }
 
     const tokens = readInputColorTokens(colorsPath);
+    console.log(tokens);
+    return false;
+
     const doc = readFramerDocument(documentPath);
     const updatedDoc = mergeColorTokens(doc, tokens);
     writeFramerDocument(updatedDoc, documentPath);
